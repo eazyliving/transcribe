@@ -1,7 +1,10 @@
 # transcribe
 transcription@home with and for fyyd.de
 
-Installiert müssen bereits sein:
+ACHTUNG! Das hier ist nicht ready to go, wenn auf Deinem Rechner/Server nicht schon vorab einige Dinge installiert und lauffähig sind.
+Das ist vor allem eine lauffähige Entwicklungsumgebung, weil die eigentliche Software, die das transkribieren übernimmt erst noch compiliert werden muss.
+
+Darüber hinaus müssen bereits installiert sein:
 
 ffmpeg
 curl
