@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if ! command -v jq &> /dev/null
+then
+	echo "Can't find jq. Please install."
+    exit
+fi
+
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
@@ -22,14 +28,14 @@ function stop {
 }
 
 function ctrl_c() {
-	
+
 	echo "------------------------------"
 	echo "STOPPING... notify fyyd"
 	echo "bye bye"
 	echo "------------------------------"
 	curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=0"
 	rm -f $PIDFILE
-	exit 
+	exit
 }
 
 pid() {
@@ -71,7 +77,7 @@ do
 	#------------------------------------------------------------------------------------
 	# get data for one episode to transcribe from fyyd.de
 	#------------------------------------------------------------------------------------
-	
+
 	echo "getting data from fyyd"
 	read ID URL TOKEN LANG DURATION TITLE < <(echo $(curl -s -H "Authorization: Bearer $ATOKEN"  "https://api.fyyd.de/0.2/transcribe/next" | jq -r '.data | .[]'))
 
@@ -82,11 +88,11 @@ do
 			echo "nothing to transcribe. exit!"
 			exit 0;
 	fi
-	
+
 	#------------------------------------------------------------------------------------
-	# download episode 
+	# download episode
 	#------------------------------------------------------------------------------------
-	
+
 	echo "starting download of episode $ID, \"$TITLE\", duration $DURATION seconds"
 
 	curl -s -L $URL > $TOKEN
@@ -95,18 +101,18 @@ do
 			echo "error downloading"
 			curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=900"
 			continue
-		
+
 	fi
-	
-	
+
+
 	#------------------------------------------------------------------------------------
-	# convert whatever was donwloaded to 16kHz WAV 
+	# convert whatever was donwloaded to 16kHz WAV
 	#------------------------------------------------------------------------------------
-	
+
 	echo "converting to wav"
 
 	ffmpeg -y -i $TOKEN -acodec pcm_s16le -ac 1 -ar 16000 $TOKEN.wav >/dev/null  2>/dev/null
-	
+
 	if [ $? -eq 1 ]
 		then
 			echo "error converting to wav"
@@ -115,41 +121,41 @@ do
 	fi
 
 	rm $TOKEN
-	
+
 	#------------------------------------------------------------------------------------
 	# transcribe wav to vtt
 	#------------------------------------------------------------------------------------
 
 	START=`date +%s`
-	
+
 	echo "starting whisper"
 	nice -n 18 ./main -su -m models/ggml-$MODEL.bin -t $THREADS -l $LANG -ovtt $TOKEN.wav >/dev/null  2>/dev/null
-	
+
 	if [ $? -ne 0 ]
 		then
 			echo "error transcribing"
 			curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=902"
 			continue
-		
+
 	fi
-	
+
 	END=`date +%s`
 	TOOK=$(($END-$START))
 
 	echo -n "Rate: "
 	printf "%.2f" $(echo "$DURATION/$TOOK" | bc -l)
 	echo "x"
-	
-		
+
+
 	#------------------------------------------------------------------------------------
 	# push transcript to fyyd
 	#------------------------------------------------------------------------------------
-	
+
 	curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/set/$ID" --data-binary @$TOKEN.wav.vtt
 
 	rm $TOKEN.wav
 	rm $TOKEN.wav.vtt
-	
+
 	if [ -f ~/.fyyd-stop ]; then
 		rm ~/.fyyd-stop
 		echo "stopping hard"
@@ -158,7 +164,7 @@ do
 
 	echo "--------------------------------------------------------------"
 	sleep 2
-	
+
 done
 
 rm $PIDFILE
