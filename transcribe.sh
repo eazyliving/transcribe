@@ -73,8 +73,16 @@ do
 	#------------------------------------------------------------------------------------
 	
 	echo "getting data from fyyd"
-	read ID URL TOKEN LANG DURATION TITLE < <(echo $(curl -s -H "Authorization: Bearer $ATOKEN"  "https://api.fyyd.de/0.2/transcribe/next" | jq -r '.data | .[]'))
-
+	
+	DATA=`echo $(curl -s -H "Authorization: Bearer $ATOKEN"  "https://api.fyyd.de/0.2/transcribe/next")`
+	
+	ID=`echo $DATA |jq -r .data.episode_id`
+	URL=`echo $DATA |jq -r .data.enclosure_url`
+	TOKEN=`echo $DATA |jq -r .data.token`
+	LANG=`echo $DATA |jq -r .data.lang`
+	DURATION=`echo $DATA |jq -r .data.duration`
+	TITLE=`echo $DATA |jq -r .data.title`
+	
 	# exit if nothing to do
 
 	if [ -z $ID  ]
