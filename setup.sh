@@ -31,6 +31,12 @@ then
     exit
 fi
 
+if ! command -v jq &> /dev/null
+then
+	echo "Can't find jq. Please install."
+    exit
+fi
+
 if [ ! -f "whisper.cpp/whisper.cpp" ]
 	then
 		echo "downloading whisper.cpp"
