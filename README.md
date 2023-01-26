@@ -13,6 +13,7 @@ Darüber hinaus müssen bereits installiert sein:
 ffmpeg
 curl
 git
+jq
 
 Benötigt wird auch ein acccesstoken für fyyd (bzw die API). Das kannst Du Dir unter
 
