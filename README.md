@@ -3,6 +3,10 @@ transcription@home with and for fyyd.de
 
 ACHTUNG! Das hier ist nicht ready to go, wenn auf Deinem Rechner/Server nicht schon vorab einige Dinge installiert und lauffähig sind.
 Das ist vor allem eine lauffähige Entwicklungsumgebung, weil die eigentliche Software, die das transkribieren übernimmt erst noch compiliert werden muss.
+Dafür kann ich keinen Support leisten, also solltest Du wissen, wo links+rechts ist, schließlich ist das ein Beta-Test :)
+
+Die Scripte sind auf macOS und Ubuntu getestet, sollten also soweit keine Probleme bereiten. 
+Aktuell ist das alles noch ohne dauerhaftes Transkribieren angelegt. Du startest das Skript und es wird transkribiert, bis nichts mehr da ist. Dann endet die Software und startet erst wieder, wenn Du das Script noch einmal startest. Das wird sich aber noch ändern... irgendwann :)
 
 Darüber hinaus müssen bereits installiert sein:
 
