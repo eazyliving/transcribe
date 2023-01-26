@@ -1,21 +1,23 @@
 #!/bin/bash
 
-ATOKEN=aXqGf52pghnrlodx8bgqdn548r9Xfhirmp9kyj6n6uklb71j6
-PIDFILE=~/.fyyd-transcribe.pid
-MODEL=medium
-THREADS=4
-STOP=0
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+if [ -f ./fyyd.cfg ]
+	then
+		source "./fyyd.cfg"
+	else
+		echo "no config found. please run setup.sh first."
+		exit 0
+fi
+
 
 export LC_NUMERIC="en_US.UTF-8"
 
 trap ctrl_c INT
 trap stop EXIT
 
-
-function stop() {
-
-	rm -f $PIDFILE
-
+function stop {
+	rm $PIDFILE
 }
 
 function ctrl_c() {
@@ -60,6 +62,7 @@ pid() {
 pid
 
 echo "Starting engines! Let's transcribe some episodes"
+cd whisper.cpp
 
 while :
 do
@@ -78,7 +81,6 @@ do
 	DURATION=`echo $DATA |jq -r .data.duration`
 	TITLE=`echo $DATA |jq -r .data.title`
 	
-
 	# exit if nothing to do
 
 	if [ -z $ID  ]
@@ -127,7 +129,7 @@ do
 	START=`date +%s`
 	
 	echo "starting whisper"
-	nice -n 18 ./main -m models/ggml-$MODEL.bin -t $THREADS -l $LANG -ovtt $TOKEN.wav >/dev/null  2>/dev/null
+	nice -n 18 ./main -su -m models/ggml-$MODEL.bin -t $THREADS -l $LANG -ovtt $TOKEN.wav >/dev/null  2>/dev/null
 	
 	if [ $? -ne 0 ]
 		then
