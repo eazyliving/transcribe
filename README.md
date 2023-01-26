@@ -5,7 +5,7 @@ ACHTUNG! Das hier ist nicht ready to go, wenn auf Deinem Rechner/Server nicht sc
 Das ist vor allem eine lauffähige Entwicklungsumgebung, weil die eigentliche Software, die das transkribieren übernimmt erst noch compiliert werden muss.
 Dafür kann ich keinen Support leisten, also solltest Du wissen, wo links+rechts ist, schließlich ist das ein Beta-Test :)
 
-Die Scripte sind auf macOS und Ubuntu getestet, sollten also soweit keine Probleme bereiten. 
+Die Scripte sind auf macOS und Ubuntu getestet, sollten also soweit keine Probleme bereiten.
 Aktuell ist das alles noch ohne dauerhaftes Transkribieren angelegt. Du startest das Skript und es wird transkribiert, bis nichts mehr da ist. Dann endet die Software und startet erst wieder, wenn Du das Script noch einmal startest. Das wird sich aber noch ändern... irgendwann :)
 
 Darüber hinaus müssen bereits installiert sein:
@@ -14,12 +14,12 @@ ffmpeg
 curl
 git
 
-Benötigt wird auch ein acccesstoken für fyyd (bzw die API). Das kannst Du Dir unter
+Benötigt wird auch ein access token für fyyd (bzw die API). Das kannst Du Dir unter
 
 https://fyyd.de/dev/app/
 
 abholen. Erstelle eine neue App (Name egal) und trage eine Beschreibung und die zwei URLs ein (auch hier: völlig egal).
-Dann drücke auf den roten Button "regenerate client creddntials" und kopiere das Token rechts unten ("user access token FOR YOU").
+Dann drücke auf den roten Button "regenerate client credentials" und kopiere das Token rechts unten ("user access token FOR YOU").
 
 Wechsel auf der Kommandozeile in den Ordner dieses repos und starte setup.sh. Entweder mit ./setup.sh oder /bin/bash setup.sh.
 
@@ -37,4 +37,4 @@ Wenn alles parat ist, kannst Du mal die transcribe.sh starten und schauen, was p
 Unterbrechung mit CTRL+C ist jederzeit möglich, dann wird fyyd signalisiert, dass die Transkription abgebrochen wurde. Oder Du legst im Ordner eine
 Datei namens .fyyd-stop an, dann wird nach der Transkription gestoppt.
 
-Und jetzt: los! :) 
+Und jetzt: los! :)
