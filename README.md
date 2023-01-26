@@ -1,2 +1,35 @@
 # transcribe
 transcription@home with and for fyyd.de
+
+Installiert müssen bereits sein:
+
+ffmpeg
+curl
+git
+
+Benötigt wird auch ein acccesstoken für fyyd (bzw die API). Das kannst Du Dir unter
+
+https://fyyd.de/dev/app/
+
+abholen. Erstelle eine neue App (Name egal) und trage eine Beschreibung und die zwei URLs ein (auch hier: völlig egal).
+Dann drücke auf den roten Button "regenerate client creddntials" und kopiere das Token rechts unten ("user access token FOR YOU").
+
+Entpacke die drei Dateien, die Du unter https://fyyd.de/transcribe-at-home.tar.gz herunterladen kannst in einen eigenen Ordner.
+
+Wechsel auf der Kommandozeile in diesen Ordner und starte setup.sh. Entweder mit ./setup.sh oder /bin/bash setup.sh.
+
+Das Script checkt jetzt, ob ffmpeg, curl und git da sind und lädt dann das repo von whisper.cpp herunter und compiliert das Zeug.
+
+Danach wirst Du gefragt, wieviele Threads Du zur Verfügung stellen möchtest. Das ist Deine Entscheidung, aber die Transkription wird mit sehr niedriger
+Prio gestartet, sodass es die Performance Deines Rechners nicht sonderlich stören sollte. Du kannst das später in der fyyd.cfg auch wieder ändern.
+
+Danach wirst Du nach dem Token gefragt. Gib's ein und fertig.
+
+Dann startet ein Test. Es wird eine 5min kurze Audiodatei von mir transkribiert. Aus dem Test folgt dann eine Empfehlung, ob das überhaupt lohnt :)
+
+Wenn alles parat ist, kannst Du mal die transcribe.sh starten und schauen, was passiert...
+
+Unterbrechung mit CTRL+C ist jederzeit möglich, dann wird fyyd signalisiert, dass die Transkription abgebrochen wurde. Oder Du legst im Ordner eine
+Datei namens .fyyd-stop an, dann wird nach der Transkription gestoppt.
+
+Und jetzt: los! :) 
