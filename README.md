@@ -14,11 +14,9 @@ https://fyyd.de/dev/app/
 abholen. Erstelle eine neue App (Name egal) und trage eine Beschreibung und die zwei URLs ein (auch hier: völlig egal).
 Dann drücke auf den roten Button "regenerate client creddntials" und kopiere das Token rechts unten ("user access token FOR YOU").
 
-Entpacke die drei Dateien, die Du unter https://fyyd.de/transcribe-at-home.tar.gz herunterladen kannst in einen eigenen Ordner.
+Wechsel auf der Kommandozeile in den Ordner dieses repos und starte setup.sh. Entweder mit ./setup.sh oder /bin/bash setup.sh.
 
-Wechsel auf der Kommandozeile in diesen Ordner und starte setup.sh. Entweder mit ./setup.sh oder /bin/bash setup.sh.
-
-Das Script checkt jetzt, ob ffmpeg, curl und git da sind und lädt dann das repo von whisper.cpp herunter und compiliert das Zeug.
+Das Script checkt jetzt, ob ffmpeg, curl und git da sind und lädt dann das repo von [whisper.cpp](https://github.com/ggerganov/whisper.cpp) herunter und compiliert es.
 
 Danach wirst Du gefragt, wieviele Threads Du zur Verfügung stellen möchtest. Das ist Deine Entscheidung, aber die Transkription wird mit sehr niedriger
 Prio gestartet, sodass es die Performance Deines Rechners nicht sonderlich stören sollte. Du kannst das später in der fyyd.cfg auch wieder ändern.
