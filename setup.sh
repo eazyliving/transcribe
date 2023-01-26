@@ -71,7 +71,6 @@ read inputthreads
 	
 if [ ! -z "$inputthreads" ]
 	then
-		echo "leer"
 		THREADS=$inputthreads
 fi		
 
