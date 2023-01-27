@@ -37,6 +37,13 @@ then
     exit
 fi
 
+if ! command -v bc &> /dev/null
+then
+	echo "Can't find bc. Please install."
+    exit
+fi
+
+
 if [ ! -f "whisper.cpp/whisper.cpp" ]
 	then
 		echo "downloading whisper.cpp"
