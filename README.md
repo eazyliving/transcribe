@@ -14,6 +14,7 @@ ffmpeg
 curl
 git
 jq
+bc
 
 Benötigt wird auch ein accesstoken für fyyd (bzw die API). Das kannst Du Dir unter
 
