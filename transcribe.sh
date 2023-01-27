@@ -17,7 +17,7 @@ trap ctrl_c INT
 trap stop EXIT
 
 function stop {
-	rm $PIDFILE
+	rm -f $PIDFILE
 }
 
 function ctrl_c() {
@@ -73,14 +73,9 @@ do
 	
 	echo "getting data from fyyd"
 	DATA=`echo $(curl -s -H "Authorization: Bearer $ATOKEN"  "https://api.fyyd.de/0.2/transcribe/next")`
-	
-	ID=`echo $DATA |jq -r .data.episode_id`
-	URL=`echo $DATA |jq -r .data.enclosure_url`
-	TOKEN=`echo $DATA |jq -r .data.token`
-	LANG=`echo $DATA |jq -r .data.lang`
-	DURATION=`echo $DATA |jq -r .data.duration`
-	TITLE=`echo $DATA |jq -r .data.title`
-	
+
+	eval "$(echo $DATA |jq -r '.data | to_entries | .[] | .key + "=" + (.value | @sh)')"	
+
 	# exit if nothing to do
 
 	if [ -z $ID  ]
@@ -95,11 +90,11 @@ do
 	
 	echo "starting download of episode $ID, \"$TITLE\", duration $DURATION seconds"
 
-	curl -s -L $URL > $TOKEN
+	curl -s -L "$URL" > $TOKEN
 	if [ $? -ne 0 ]
 		then
 			echo "error downloading"
-			curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=900"
+			curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=10"
 			continue
 		
 	fi
@@ -116,7 +111,7 @@ do
 	if [ $? -eq 1 ]
 		then
 			echo "error converting to wav"
-			curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=901"
+			curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=11"
 			continue
 	fi
 
@@ -134,7 +129,7 @@ do
 	if [ $? -ne 0 ]
 		then
 			echo "error transcribing"
-			curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=902"
+			curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=12"
 			continue
 		
 	fi
