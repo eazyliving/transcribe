@@ -90,7 +90,7 @@ do
 	
 	echo "starting download of episode $ID, \"$TITLE\", duration $DURATION seconds"
 
-	curl -s -L "$URL" > $TOKEN
+	curl -s -L "${URL}" > $TOKEN
 	if [ $? -ne 0 ]
 		then
 			echo "error downloading"
@@ -121,10 +121,15 @@ do
 	# transcribe wav to vtt
 	#------------------------------------------------------------------------------------
 
+	if [ "$LANG" == "null" ]
+		then
+			$LANG = "auto"
+	fi
+	
 	START=`date +%s`
 	
 	echo "starting whisper"
-	nice -n 18 ./main -su -m models/ggml-$MODEL.bin -t $THREADS -l $LANG -ovtt $TOKEN.wav >/dev/null  2>/dev/null
+	nice -n 18 ./main -su -m models/ggml-$MODEL.bin -t $THREADS -l $LANG -ovtt $TOKEN.wav >/dev/null 2>/dev/null
 	
 	if [ $? -ne 0 ]
 		then

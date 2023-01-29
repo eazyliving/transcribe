@@ -94,7 +94,6 @@ if [ -z "$ACCESSTOKEN" ]
 		read token_input
 		if [ ! -z "$token_input" ]
 			then
-				echo "READ"
 				ACCESSTOKEN=$token_input
 		fi
 fi
