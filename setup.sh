@@ -101,7 +101,7 @@ fi
 START=`date +%s`
 
 echo -e "\nstarting test. this might take some minutes, please wait...\n"
-nice -n 18 ./main -m models/ggml-medium.bin -su $THREAD_OPT -l de ../test.wav 2>/dev/null
+nice -n 18 ./main -m models/ggml-medium.bin $THREAD_OPT -l de ../test.wav 2>/dev/null
 
 if [ $? -ne 0 ]
 	then
@@ -120,7 +120,7 @@ echo -e "-----------------------------------------------------------------------
 echo -n "transcription took $TOOK seconds for 300 seconds audio. that is "
 printf "%.2f" $(echo "$DURATION/$TOOK" | bc -l)
 echo " times faster than realtime audio."
-
+exit
 if (( $(echo "$RATE < 1.5" |bc -l) ))
 	then
 		echo "that's very slow and you should maybe NOT transcribe with this computer."

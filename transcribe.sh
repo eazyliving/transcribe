@@ -11,6 +11,12 @@ if [ -f ./fyyd.cfg ]
 fi
 
 
+if [ -z $ATOKEN  ]
+	then
+		echo "Please get an accesstoken first. Visit https://fyyd.de/dev/app/ to create one."
+		exit 0;
+fi
+
 export LC_NUMERIC="en_US.UTF-8"
 
 trap ctrl_c INT
@@ -23,7 +29,7 @@ function stop {
 function ctrl_c() {
 	
 	echo "------------------------------"
-	echo "STOPPING... notify fyyd"
+	echo "STOPPING... sending notification to fyyd"
 	echo "bye bye"
 	echo "------------------------------"
 	curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=0"
@@ -70,6 +76,8 @@ do
 	#------------------------------------------------------------------------------------
 	# get data for one episode to transcribe from fyyd.de
 	#------------------------------------------------------------------------------------
+	
+	ID=""
 	
 	echo "getting data from fyyd"
 	DATA=`echo $(curl -s -H "Authorization: Bearer $ATOKEN"  "https://api.fyyd.de/0.2/transcribe/next")`
@@ -129,7 +137,7 @@ do
 	START=`date +%s`
 	
 	echo "starting whisper"
-	nice -n 18 ./main -su -m models/ggml-$MODEL.bin -t $THREADS -l $LANG -ovtt $TOKEN.wav >/dev/null 2>/dev/null
+	nice -n 18 ./main -m models/ggml-$MODEL.bin -t $THREADS -l $LANG -ovtt $TOKEN.wav >/dev/null 2>/dev/null
 	
 	if [ $? -ne 0 ]
 		then
@@ -151,8 +159,8 @@ do
 	# push transcript to fyyd
 	#------------------------------------------------------------------------------------
 	
+	echo "sending transcript to fyyd"
 	curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/set/$ID" --data-binary @$TOKEN.wav.vtt
-
 	rm $TOKEN.wav
 	rm $TOKEN.wav.vtt
 	
@@ -164,7 +172,6 @@ do
 
 	echo "--------------------------------------------------------------"
 	sleep 2
-	
 done
 
 rm $PIDFILE
