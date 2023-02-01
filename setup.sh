@@ -131,6 +131,7 @@ if (( $(echo "$RATE < 1.5" |bc -l) ))
 		echo "that's great. let's transcribe some podcasts!"
 fi
 
+echo "Please remember: This thread was running with very low priority. Maybe you were watching a video or doing something else that consumed a lot of power. So maybe this rate does not reflect the actual performance of this machine."
 echo
 cd ..
 
