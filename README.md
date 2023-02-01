@@ -32,7 +32,7 @@ Prio gestartet, sodass es die Performance Deines Rechners nicht sonderlich stör
 
 Danach wirst Du nach dem Token gefragt. Gib's ein und fertig.
 
-Dann startet ein Test. Es wird eine 5min kurze Audiodatei von mir transkribiert. Aus dem Test folgt dann eine Empfehlung, ob das überhaupt lohnt :)
+Es wird nun eine 5min kurze Audiodatei aus der guten alten Hörsuppe transkribiert. Aus dem Test folgt dann eine Empfehlung, ob das überhaupt lohnt :)
 
 Wenn alles parat ist, kannst Du mal die transcribe.sh starten und schauen, was passiert...
 
