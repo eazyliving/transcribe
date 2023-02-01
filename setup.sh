@@ -120,7 +120,7 @@ echo -e "-----------------------------------------------------------------------
 echo -n "transcription took $TOOK seconds for 300 seconds audio. that is "
 printf "%.2f" $(echo "$DURATION/$TOOK" | bc -l)
 echo " times faster than realtime audio."
-exit
+
 if (( $(echo "$RATE < 1.5" |bc -l) ))
 	then
 		echo "that's very slow and you should maybe NOT transcribe with this computer."
