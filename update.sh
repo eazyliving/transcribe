@@ -5,10 +5,10 @@
 #
 
 # transcribe itself
-git pull origin master
+git pull origin 
 
 
 # whisper.cpp
 cd whisper.cpp
-git pull origin master
-make all
+git pull origin
+make 2>/dev/null >/dev/null

@@ -67,6 +67,10 @@ pid() {
 
 pid
 
+echo "Checking for updates"
+
+./update.sh
+
 echo "Starting engines! Let's transcribe some episodes"
 cd whisper.cpp
 
