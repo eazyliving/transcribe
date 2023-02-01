@@ -4,15 +4,11 @@
 # Check the installation for updates
 #
 
-if [[ $(git diff --stat) != '' ]]; then
-	echo "updating transcription git"
-	git pull origin master
-fi
+# transcribe itself
+git pull origin master
 
+
+# whisper.cpp
 cd whisper.cpp
-
-if [[ $(git diff --stat) != '' ]]; then
-	echo "updating whisper.cpp"
-	git pull origin master
-	make all
-fi
+git pull origin master
+make all
