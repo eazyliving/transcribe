@@ -1,6 +1,8 @@
 #!/bin/bash
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+PB_PID=""
+RATESFILE=${SCRIPT_DIR}/.rates.txt
 
 if [ -f ./fyyd.cfg ]
 	then
@@ -9,7 +11,6 @@ if [ -f ./fyyd.cfg ]
 		echo "no config found. please run setup.sh first."
 		exit 0
 fi
-
 
 if [ -z $ATOKEN  ]
 	then
@@ -27,7 +28,12 @@ function stop {
 }
 
 function ctrl_c() {
-	
+
+	if [ ! -z $PB_PID  ]
+		then
+			kill $PB_PID
+			wait $PB_PID 2>/dev/null
+	fi
 	echo "------------------------------"
 	echo "STOPPING... sending notification to fyyd"
 	echo "bye bye"
@@ -35,6 +41,33 @@ function ctrl_c() {
 	curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=0"
 	rm -f $PIDFILE
 	exit 
+}
+
+progress() {
+	
+	if [ -z $PB_PID ]
+		then
+			while :
+			do
+				ETA=$((ETA-1))
+				printf "\rETA: "
+				echo -n `date -u -r ${ETA#-} +%T`
+				echo -n " "
+				if (( $(echo "$ETA < 0" |bc -l) ))
+				then
+					echo -n "over calculation "
+				fi
+	
+				sleep 1
+		
+			done 2>/dev/null &
+			PB_PID=$!
+		else
+			kill $PB_PID
+			wait $PB_PID 2>/dev/null
+			PB_PID=""
+	fi
+	
 }
 
 pid() {
@@ -70,8 +103,8 @@ pid
 echo "Checking for updates"
 
 ./update.sh
-
-echo "Starting engines! Let's transcribe some episodes"
+	
+echo "Starting engines! Let's transcribe some episodes!"
 cd whisper.cpp
 
 while :
@@ -100,7 +133,7 @@ do
 	# download episode 
 	#------------------------------------------------------------------------------------
 	
-	echo "starting download of episode $ID, \"$TITLE\", duration $DURATION seconds"
+	echo "starting download of episode $ID, \"$TITLE\", duration $DURATION seconds (`date -u -r $DURATION +%T`)"
 
 	curl -s -L "${URL}" > $TOKEN
 	if [ $? -ne 0 ]
@@ -133,32 +166,62 @@ do
 	# transcribe wav to vtt
 	#------------------------------------------------------------------------------------
 
-	if [ "$LANG" == "null" ]
+	if [ ${LANG} == "null" ]
 		then
-			$LANG = "auto"
+			LANG="auto"
 	fi
 	
 	START=`date +%s`
 	
+	#
+	# calculate the avg rate at which episodes are transcribed.
+	# that should be ok if rates of at least 10 transcriptions are gathered.
+	#
+	 
+	if [ -f $RATESFILE ]
+		then
+			RATE_ETA=`cat $RATESFILE | sort -n | awk '{x+=$0}END{print x/NR}'`
+			if [ ${RATE_ETA} == '0' ]
+				then
+					RATE_ETA=1
+			fi
+		else
+			RATE_ETA=1	
+	fi
+
+	ETA=`echo "scale=0;$DURATION/$RATE_ETA" | bc -l`
+
 	echo "starting whisper"
-	nice -n 18 ./main -m models/ggml-$MODEL.bin -t $THREADS -l $LANG -ovtt $TOKEN.wav >/dev/null 2>/dev/null
+
+	# start process to display guessed remaining time
 	
+	progress
+
+	nice -n 18 ./main -m models/ggml-$MODEL.bin -t $THREADS -l $LANG -ovtt $TOKEN.wav >/dev/null 2>/dev/null
+
 	if [ $? -ne 0 ]
 		then
 			echo "error transcribing"
 			curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=12"
+			progress
+			printf "\b"
 			continue
-		
 	fi
 	
+	progress
+
+	echo ""	
 	END=`date +%s`
 	TOOK=$(($END-$START))
 
 	echo -n "Rate: "
-	printf "%.2f" $(echo "$DURATION/$TOOK" | bc -l)
+	RATE=$(echo "$DURATION/$TOOK" | bc -l)
+	printf "%.2f" $RATE
 	echo "x"
 	
-		
+	# record the rate for next calculation of ETA
+	echo "$RATE" >>$RATESFILE 
+
 	#------------------------------------------------------------------------------------
 	# push transcript to fyyd
 	#------------------------------------------------------------------------------------

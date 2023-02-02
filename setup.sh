@@ -8,7 +8,6 @@ if [ -f ./fyyd.cfg ]
 		source "./fyyd.cfg"
 fi
 
-
 export LC_NUMERIC="en_US.UTF-8"
 
 # Check ffmpeg etc
@@ -140,3 +139,4 @@ echo "THREADS=$THREADS" >> ./fyyd.cfg
 echo "ATOKEN=$ACCESSTOKEN" >> ./fyyd.cfg
 echo "PIDFILE=~/.fyyd-transcribe.pid" >> ./fyyd.cfg
 echo "MODEL=medium" >> ./fyyd.cfg
+echo "$RATE" >>./.rates.txt
