@@ -33,7 +33,7 @@ function ETASTRING {
 		then
 			echo -n `date -u -r ${TETA#-} +%T`
 		else
-			echo -n `date -u -d${TETA#-} +%T`
+			echo -n `date -d@${TETA} -u +%T`
 	fi
 
 
