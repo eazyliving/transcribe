@@ -95,7 +95,6 @@ progress() {
 								THISRATE=$(echo "$WHERE/$SECONDSGONE" | bc -l)
 						fi	
 				
-						THISRATE=$(printf "%.1f" $THISRATE)
 						ETA=$(echo "$DURATION/$THISRATE - $SECONDSGONE" | bc -l)
 				fi
 								
