@@ -2,7 +2,8 @@
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PB_PID=""
-RATESFILE=${SCRIPT_DIR}/.rates.txt
+
+export LC_NUMERIC="en_US.UTF-8"
 
 if [ -f ./fyyd.cfg ]
 	then
@@ -18,14 +19,17 @@ if [ -z $ATOKEN  ]
 		exit 0;
 fi
 
-export LC_NUMERIC="en_US.UTF-8"
 
 trap ctrl_c INT
 trap stop EXIT
 
 function stop {
 	rm -f $PIDFILE
-	rm -f ./redir.txt
+	if [ ! -z $PB_PID  ]
+		then
+			kill $PB_PID
+			wait $PB_PID 2>/dev/null
+	fi
 }
 
 function ctrl_c() {
@@ -34,6 +38,7 @@ function ctrl_c() {
 		then
 			kill $PB_PID
 			wait $PB_PID 2>/dev/null
+			PB_PID=""
 	fi
 	echo "------------------------------"
 	echo "STOPPING... sending notification to fyyd"
@@ -50,24 +55,61 @@ progress() {
 		then
 			while :
 			do
-				
-				printf "\r\033[K"
-
-				ETA=$((ETA-1))
-				printf "\rETA: "
-				echo -n `date -u -r ${ETA#-} +%T`
-				echo -n " "
-				if (( $(echo "$ETA < 0" |bc -l) ))
-				then
-					echo -n " (+) "
-				fi
-	
-
 				LINE=$(tail -1 ./redir.txt)
-				echo -n $LINE
+				if [ -z "$LINE" ]
+					then
+						
+						# no output by whisper so far...
+					
+						echo -n "."
+						LASTLINE=""
+						sleep 1
+						continue
+				fi
+				
+				SECONDSGONE=$((SECONDSGONE+1))
+				if [ $SECONDSGONE -eq 1 ]
+					then
+						echo ""
+				fi
+				
+				if [ "$LINE" = "$LASTLINE" ]
+					then
+						# no new output, just count down
+						ETA=$((ETA-1))
+					else
+					
+						# it did smth! calculate new rate and estimate the remaining time
+						
+						LASTLINE="$LINE"
+						STAMP=$(echo ${LINE} | awk 'BEGIN { FS="[ ]" } ; { print $3 }')
+						IFS=: read -r h m s <<<"${STAMP:0:8}"
+						h=${h#0};m=${m#0};s=${s#0}
+					
+						WHERE=$(((h * 60 + m) * 60 + s))
+						
+						if [ $WHERE -eq 0 ]
+							then
+								THISRATE=1
+							else
+								THISRATE=$(echo "$WHERE/$SECONDSGONE" | bc -l)
+						fi	
+				
+						THISRATE=$(printf "%.1f" $THISRATE)
+						ETA=$(echo "$DURATION/$THISRATE - $SECONDSGONE" | bc -l)
+				fi
+								
+				ETA=$(printf "%.0f" "$ETA")
+		
+				printf "\r\033[KETA: "
+				echo -n `date -u -r ${ETA#-} +%T`
+				echo -n " ("
+				printf "%.1f" $THISRATE 
+
+				echo -n "x) ${LINE:0:$(tput cols)-30}"
 				sleep 1
 		
-			done 2>/dev/null &
+			done  & 
 			PB_PID=$!
 		else
 			kill $PB_PID
@@ -185,23 +227,11 @@ do
 	# that should be ok if rates of at least 10 transcriptions are gathered.
 	#
 	 
-	if [ -f $RATESFILE ]
-		then
-			RATE_ETA=`cat $RATESFILE | sort -n | awk '{x+=$0}END{print x/NR}'`
-			if [ ${RATE_ETA} == '0' ]
-				then
-					RATE_ETA=1
-			fi
-		else
-			RATE_ETA=1	
-	fi
-
-	ETA=`echo "scale=0;$DURATION/$RATE_ETA" | bc -l`
-
-	echo "starting whisper"
+	echo -n "waiting for whisper"
 
 	# start process to display guessed remaining time
-	
+	SECONDSGONE=0
+	LASTLINE=""
 	progress
 
 	nice -n 18 ./main -m models/ggml-$MODEL.bin -t $THREADS -l $LANG -ovtt $TOKEN.wav >./redir.txt 2>/dev/null
@@ -226,8 +256,6 @@ do
 	printf "%.2f" $RATE
 	echo "x"
 	
-	# record the rate for next calculation of ETA
-	echo "$RATE" >>$RATESFILE 
 
 	#------------------------------------------------------------------------------------
 	# push transcript to fyyd
