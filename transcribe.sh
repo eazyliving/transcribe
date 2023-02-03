@@ -75,9 +75,9 @@ progress() {
 						continue
 				fi
 				
-				if [ -z $LASTLINE ]
+				if [ -z "$LASTLINE" ]
 					then
-						echo ""
+						echo
 				fi
 				
 				if [ "$LINE" = "$LASTLINE" ]
@@ -88,7 +88,6 @@ progress() {
 					
 						# it did smth! calculate new rate and estimate the remaining time :)
 						
-						LASTLINE="$LINE"
 						STAMP=$(echo ${LINE} | awk 'BEGIN { FS="[ ]" } ; { print $3 }')
 						IFS=: read -r h m s <<<"${STAMP:0:8}"
 						h=${h#0};m=${m#0};s=${s#0}
@@ -108,7 +107,14 @@ progress() {
 								
 				ETA=$(printf "%.0f" "$ETA")
 		
-				printf "\r\033[KETA: "
+				if [ "$LINE" = "$LASTLINE" ]
+					then
+						printf "\rETA: "
+					else
+						printf "\r\033[KETA: "
+				
+				fi
+
 				echo -n `date -u -r ${ETA#-} +%T`
 			
 				if (( $(echo "$THISRATE > $LASTRATE" |bc -l) ))
@@ -123,8 +129,14 @@ progress() {
 
 				printf " ($COLOR%.1fx$NOCOLOR)" $THISRATE
 				
-				echo -n " ${LINE:0:$(tput cols)-30}"
-				
+				if [ "$LINE" = "$LASTLINE" ]
+					then
+						echo -n
+					else
+						echo -n " ${LINE:0:$(tput cols)-30}"
+				fi
+
+				LASTLINE="$LINE"
 				LASTRATE=$THISRATE
 				sleep 1
 		
@@ -264,7 +276,7 @@ do
 	fi
 	
 	progress
-
+	echo
 
 	#------------------------------------------------------------------------------------
 	# push transcript to fyyd
