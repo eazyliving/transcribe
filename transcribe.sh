@@ -79,7 +79,7 @@ progress() {
 						ETA=$((ETA-1))
 					else
 					
-						# it did smth! calculate new rate and estimate the remaining time
+						# it did smth! calculate new rate and estimate the remaining time :)
 						
 						LASTLINE="$LINE"
 						STAMP=$(echo ${LINE} | awk 'BEGIN { FS="[ ]" } ; { print $3 }')
