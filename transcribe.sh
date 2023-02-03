@@ -269,7 +269,7 @@ do
 	# that should be ok if rates of at least 10 transcriptions are gathered.
 	#
 	 
-	echo -n "waiting for whisper"
+	echo -n "loading model"
 
 	# start process to display guessed remaining time
 	
