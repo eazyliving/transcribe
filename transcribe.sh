@@ -115,8 +115,13 @@ progress() {
 				
 				fi
 
-				echo -n `date -u -r ${ETA#-} +%T`
-			
+				if [ "$(uname -s)" == "Darwin" ]
+					then
+						echo -n `date -u -r ${ETA#-} +%T`
+					else
+						echo -n `date  -d${ETA#-} +%T`
+				fi
+					
 				if (( $(echo "$THISRATE > $LASTRATE" |bc -l) ))
 					then
 						COLOR=$GREEN
