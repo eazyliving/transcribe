@@ -26,6 +26,19 @@ fi
 trap ctrl_c INT
 trap stop EXIT
 
+function ETASTRING {
+	
+	TETA="$1"
+	if [ "$(uname -s)" == "Darwin" ]
+		then
+			echo -n `date -u -r ${TETA#-} +%T`
+		else
+			echo -n `date -u -d${TETA#-} +%T`
+	fi
+
+
+}
+
 function stop {
 	rm -f $PIDFILE
 	if [ ! -z $PB_PID  ]
@@ -115,12 +128,7 @@ progress() {
 				
 				fi
 
-				if [ "$(uname -s)" == "Darwin" ]
-					then
-						echo -n `date -u -r ${ETA#-} +%T`
-					else
-						echo -n `date  -d${ETA#-} +%T`
-				fi
+				ETASTRING "$ETA"
 					
 				if (( $(echo "$THISRATE > $LASTRATE" |bc -l) ))
 					then
@@ -218,7 +226,7 @@ do
 	# download episode 
 	#------------------------------------------------------------------------------------
 	
-	echo "starting download of episode $ID, \"$TITLE\", duration $DURATION seconds (`date -u -r $DURATION +%T`)"
+	echo "starting download of episode $ID, \"$TITLE\", duration $DURATION seconds ($(ETASTRING $DURATION))"
 
 	curl -s -L "${URL}" > $TOKEN
 	if [ $? -ne 0 ]
