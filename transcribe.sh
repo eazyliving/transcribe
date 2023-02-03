@@ -4,7 +4,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PB_PID=""
 
 RED='\033[0;31m'
-NC='\033[0m'
+NOCOLOR='\033[0m'
 GREEN='\033[0;32m'
 
 export LC_NUMERIC="en_US.UTF-8"
@@ -108,28 +108,25 @@ progress() {
 		
 				printf "\r\033[KETA: "
 				echo -n `date -u -r ${ETA#-} +%T`
+			
 				if (( $(echo "$THISRATE > $LASTRATE" |bc -l) ))
 					then
-						printf " ($GREEN%.1fx$NC)" $THISRATE
-						
-				fi
-			
-				if (( $(echo "$THISRATE < $LASTRATE" |bc -l) ))
+						COLOR=$GREEN
+				elif (( $(echo "$THISRATE < $LASTRATE" |bc -l) ))
 					then
-						printf " ($RED%.1fx$NC)" $THISRATE
+						COLOR=$RED
+					else
+						COLOR=$NOCOLOR
 				fi
-			
-				if (( $(echo "$THISRATE == $LASTRATE" |bc -l) ))
-					then
-						printf " (%.1fx)" $THISRATE 
-				fi
+
+				printf " ($COLOR%.1fx$NOCOLOR)" $THISRATE
 				
 				echo -n " ${LINE:0:$(tput cols)-30}"
 				
 				LASTRATE=$THISRATE
 				sleep 1
 		
-			done  & 
+			done  & 2>/dev/null
 			PB_PID=$!
 		else
 			kill $PB_PID
