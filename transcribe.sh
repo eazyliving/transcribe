@@ -25,6 +25,7 @@ trap stop EXIT
 
 function stop {
 	rm -f $PIDFILE
+	rm -f ./redir.txt
 }
 
 function ctrl_c() {
@@ -49,15 +50,21 @@ progress() {
 		then
 			while :
 			do
+				
+				printf "\r\033[K"
+
 				ETA=$((ETA-1))
 				printf "\rETA: "
 				echo -n `date -u -r ${ETA#-} +%T`
 				echo -n " "
 				if (( $(echo "$ETA < 0" |bc -l) ))
 				then
-					echo -n "over calculation "
+					echo -n " (+) "
 				fi
 	
+
+				LINE=$(tail -1 ./redir.txt)
+				echo -n $LINE
 				sleep 1
 		
 			done 2>/dev/null &
@@ -197,7 +204,7 @@ do
 	
 	progress
 
-	nice -n 18 ./main -m models/ggml-$MODEL.bin -t $THREADS -l $LANG -ovtt $TOKEN.wav >/dev/null 2>/dev/null
+	nice -n 18 ./main -m models/ggml-$MODEL.bin -t $THREADS -l $LANG -ovtt $TOKEN.wav >./redir.txt 2>/dev/null
 
 	if [ $? -ne 0 ]
 		then
