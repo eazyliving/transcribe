@@ -23,7 +23,6 @@ if [ -z $ATOKEN  ]
 		exit 0;
 fi
 
-
 trap ctrl_c INT
 trap stop EXIT
 
@@ -48,6 +47,7 @@ function ctrl_c() {
 	echo "STOPPING... sending notification to fyyd"
 	echo "bye bye"
 	echo "------------------------------"
+	
 	curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=0"
 	rm -f $PIDFILE
 	exit 
@@ -59,6 +59,9 @@ progress() {
 		then
 			while :
 			do
+				
+				SECONDSGONE=$((SECONDSGONE+1))
+				
 				LINE=$(tail -1 ./redir.txt)
 				if [ -z "$LINE" ]
 					then
@@ -72,8 +75,7 @@ progress() {
 						continue
 				fi
 				
-				SECONDSGONE=$((SECONDSGONE+1))
-				if [ $SECONDSGONE -eq 1 ]
+				if [ -z $LASTLINE ]
 					then
 						echo ""
 				fi
@@ -237,8 +239,6 @@ do
 			LANG="auto"
 	fi
 	
-	START=`date +%s`
-	
 	#
 	# calculate the avg rate at which episodes are transcribed.
 	# that should be ok if rates of at least 10 transcriptions are gathered.
@@ -247,6 +247,7 @@ do
 	echo -n "waiting for whisper"
 
 	# start process to display guessed remaining time
+	
 	SECONDSGONE=0
 	LASTLINE=""
 	progress
@@ -264,15 +265,6 @@ do
 	
 	progress
 
-	echo ""	
-	END=`date +%s`
-	TOOK=$(($END-$START))
-
-	echo -n "Rate: "
-	RATE=$(echo "$DURATION/$TOOK" | bc -l)
-	printf "%.2f" $RATE
-	echo "x"
-	
 
 	#------------------------------------------------------------------------------------
 	# push transcript to fyyd
