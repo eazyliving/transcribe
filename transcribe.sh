@@ -3,6 +3,10 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PB_PID=""
 
+RED='\033[0;31m'
+NC='\033[0m'
+GREEN='\033[0;32m'
+
 export LC_NUMERIC="en_US.UTF-8"
 
 if [ -f ./fyyd.cfg ]
@@ -63,6 +67,7 @@ progress() {
 					
 						echo -n "."
 						LASTLINE=""
+						LASTRATE=0
 						sleep 1
 						continue
 				fi
@@ -96,16 +101,32 @@ progress() {
 						fi	
 				
 						ETA=$(echo "$DURATION/$THISRATE - $SECONDSGONE" | bc -l)
+						
 				fi
 								
 				ETA=$(printf "%.0f" "$ETA")
 		
 				printf "\r\033[KETA: "
 				echo -n `date -u -r ${ETA#-} +%T`
-				echo -n " ("
-				printf "%.1f" $THISRATE 
-
-				echo -n "x) ${LINE:0:$(tput cols)-30}"
+				if (( $(echo "$THISRATE > $LASTRATE" |bc -l) ))
+					then
+						printf " ($GREEN%.1fx$NC)" $THISRATE
+						
+				fi
+			
+				if (( $(echo "$THISRATE < $LASTRATE" |bc -l) ))
+					then
+						printf " ($RED%.1fx$NC)" $THISRATE
+				fi
+			
+				if (( $(echo "$THISRATE == $LASTRATE" |bc -l) ))
+					then
+						printf " (%.1fx)" $THISRATE 
+				fi
+				
+				echo -n " ${LINE:0:$(tput cols)-30}"
+				
+				LASTRATE=$THISRATE
 				sleep 1
 		
 			done  & 
