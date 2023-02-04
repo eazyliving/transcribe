@@ -263,11 +263,6 @@ do
 		then
 			LANG="auto"
 	fi
-	
-	#
-	# calculate the avg rate at which episodes are transcribed.
-	# that should be ok if rates of at least 10 transcriptions are gathered.
-	#
 	 
 	echo -n "loading model"
 
@@ -290,6 +285,8 @@ do
 	
 	progress
 	echo
+	echo "finished transcription in $(ETASTRING $SECONDSGONE)"
+
 
 	#------------------------------------------------------------------------------------
 	# push transcript to fyyd

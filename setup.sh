@@ -58,7 +58,7 @@ if [ ! -f "whisper.cpp/whisper.cpp" ]
 		make
 		
 		echo "downloading the model"
-		./models/download-ggml-model.sh medium	
+		./models/download-ggml-model.sh small	
 	else
 		cd whisper.cpp
 fi
@@ -143,4 +143,4 @@ rm -f fyyd.cfg
 echo "THREADS=$THREADS" >> ./fyyd.cfg
 echo "ATOKEN=$ACCESSTOKEN" >> ./fyyd.cfg
 echo "PIDFILE=~/.fyyd-transcribe.pid" >> ./fyyd.cfg
-echo "MODEL=medium" >> ./fyyd.cfg
+echo "MODEL=small" >> ./fyyd.cfg
