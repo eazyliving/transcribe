@@ -146,7 +146,7 @@ progress() {
 					then
 						echo -n
 					else
-						echo -n " ${LINE:0:$(tput cols)-30}"
+						echo -n " ${LINE:0:$(tput cols)}"
 				fi
 
 				LASTLINE="$LINE"
@@ -199,6 +199,9 @@ echo "Checking for updates"
 	
 echo "Starting engines! Let's transcribe some episodes!"
 cd whisper.cpp
+
+printf '=%.0s' $(seq 1  $(tput cols))
+echo ""
 
 while :
 do
@@ -309,7 +312,9 @@ do
 		exit
 	fi
 
-	echo "--------------------------------------------------------------"
+
+	printf '=%.0s' $(seq 1 $(tput cols))
+	echo ""
 	sleep 2
 done
 
