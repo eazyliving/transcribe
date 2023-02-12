@@ -267,25 +267,31 @@ do
 	echo -n "loading model"
 
 	# start process to display guessed remaining time
+	START=`date +%s`
 	
 	SECONDSGONE=0
 	LASTLINE=""
 	progress
 
 	nice -n 18 ./main -m models/ggml-$MODEL.bin -t $THREADS -l $LANG -ovtt $TOKEN.wav >./redir.txt 2>/dev/null
-
+    
 	if [ $? -ne 0 ]
 		then
 			echo "error transcribing"
 			curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=12"
 			progress
-			printf "\b"
+			echo
 			continue
 	fi
 	
 	progress
+	
+	END=`date +%s`
+	TOOK=$(echo "$END - $START" |bc -l)
 	echo
-	echo "finished transcription in $(ETASTRING $SECONDSGONE)"
+	echo "finished transcription in $(ETASTRING $TOOK)"
+
+
 
 
 	#------------------------------------------------------------------------------------
