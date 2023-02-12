@@ -102,6 +102,16 @@ if [ -z "$ACCESSTOKEN" ]
 		fi
 fi
 
+cd ..
+
+rm -f fyyd.cfg
+echo "THREADS=$THREADS" >> ./fyyd.cfg
+echo "ATOKEN=$ACCESSTOKEN" >> ./fyyd.cfg
+echo "PIDFILE=~/.fyyd-transcribe.pid" >> ./fyyd.cfg
+echo "MODEL=small" >> ./fyyd.cfg
+
+cd whisper.cpp
+
 START=`date +%s`
 
 echo -e "\nstarting test. this might take some minutes, please wait...\n"
@@ -137,10 +147,3 @@ fi
 
 echo "Please remember: This thread was running with very low priority. Maybe you were watching a video or doing something else that consumed a lot of power. So maybe this rate does not reflect the actual performance of this machine."
 echo
-cd ..
-
-rm -f fyyd.cfg
-echo "THREADS=$THREADS" >> ./fyyd.cfg
-echo "ATOKEN=$ACCESSTOKEN" >> ./fyyd.cfg
-echo "PIDFILE=~/.fyyd-transcribe.pid" >> ./fyyd.cfg
-echo "MODEL=small" >> ./fyyd.cfg
