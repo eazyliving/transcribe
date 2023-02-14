@@ -146,7 +146,7 @@ progress() {
 					then
 						echo -n
 					else
-						echo -n " ${LINE:0:$(tput cols)}"
+						echo -n " ${LINE:0:$(echo $(tput cols)-25|bc -l)}"
 				fi
 
 				LASTLINE="$LINE"
