@@ -108,7 +108,7 @@ rm -f fyyd.cfg
 echo "THREADS=$THREADS" >> ./fyyd.cfg
 echo "ATOKEN=$ACCESSTOKEN" >> ./fyyd.cfg
 echo "PIDFILE=~/.fyyd-transcribe.pid" >> ./fyyd.cfg
-echo "MODEL=small" >> ./fyyd.cfg
+echo "MODEL=medium" >> ./fyyd.cfg
 
 cd whisper.cpp
 
