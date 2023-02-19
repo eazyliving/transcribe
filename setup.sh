@@ -116,7 +116,7 @@ cd whisper.cpp
 START=`date +%s`
 
 echo -e "\nstarting test. this might take some minutes, please wait...\n"
-nice -n 18 ./main -m models/ggml-small.bin $THREAD_OPT -l de ../test.wav 2>/dev/null
+nice -n 18 ./main -m models/ggml-$MODEL.bin $THREAD_OPT -l de ../test.wav 2>/dev/null
 
 if [ $? -ne 0 ]
 	then
