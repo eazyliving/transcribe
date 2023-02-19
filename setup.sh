@@ -1,5 +1,6 @@
 #!/bin/bash
 
+MODEL=medium
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR
 
@@ -58,7 +59,7 @@ if [ ! -f "whisper.cpp/whisper.cpp" ]
 		make
 		
 		echo "downloading the model"
-		./models/download-ggml-model.sh small	
+		./models/download-ggml-model.sh $MODEL	
 	else
 		cd whisper.cpp
 fi
@@ -108,7 +109,7 @@ rm -f fyyd.cfg
 echo "THREADS=$THREADS" >> ./fyyd.cfg
 echo "ATOKEN=$ACCESSTOKEN" >> ./fyyd.cfg
 echo "PIDFILE=~/.fyyd-transcribe.pid" >> ./fyyd.cfg
-echo "MODEL=medium" >> ./fyyd.cfg
+echo "MODEL=$MODEL" >> ./fyyd.cfg
 
 cd whisper.cpp
 
