@@ -1,7 +1,9 @@
 #!/bin/bash
+set -eu
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PB_PID=""
+tmpdir=""
 
 RED='\033[0;31m'
 NOCOLOR='\033[0m'
@@ -43,8 +45,11 @@ function stop {
 	rm -f $PIDFILE
 	if [ ! -z $PB_PID  ]
 		then
-			kill $PB_PID
-			wait $PB_PID 2>/dev/null
+			kill $PB_PID || true
+			wait $PB_PID 2>/dev/null || true
+	fi
+	if [[ -n $tmpdir ]]; then
+		rm -rf "$tmpdir" 2>/dev/null
 	fi
 }
 
@@ -52,8 +57,8 @@ function ctrl_c() {
 
 	if [ ! -z $PB_PID  ]
 		then
-			kill $PB_PID
-			wait $PB_PID 2>/dev/null
+			kill $PB_PID || true
+			wait $PB_PID 2>/dev/null || true
 			PB_PID=""
 	fi
 	echo "------------------------------"
@@ -157,7 +162,7 @@ progress() {
 			PB_PID=$!
 		else
 			kill $PB_PID
-			wait $PB_PID 2>/dev/null
+			wait $PB_PID 2>/dev/null || true
 			PB_PID=""
 	fi
 	
@@ -198,13 +203,15 @@ echo "Checking for updates"
 ./update.sh
 	
 echo "Starting engines! Let's transcribe some episodes!"
-cd whisper.cpp
 
 printf '=%.0s' $(seq 1  $(tput cols))
 echo ""
 
 while :
 do
+
+    tmpdir=$(mktemp --directory --tmpdir fyyd-transcribe.XXXXXX)
+    cd "$tmpdir"
 
 	#------------------------------------------------------------------------------------
 	# get data for one episode to transcribe from fyyd.de
@@ -276,9 +283,9 @@ do
 	LASTLINE=""
 	progress
 
-	nice -n 18 ./main -m models/ggml-$MODEL.bin -t $THREADS -l $LANG -ovtt $TOKEN.wav >./redir.txt 2>/dev/null
-    
-	if [ $? -ne 0 ]
+	if ! nice -n 18 "$SCRIPT_DIR"/whisper.cpp/main \
+		-m "$SCRIPT_DIR"/whisper.cpp/models/ggml-$MODEL.bin -t $THREADS -l $LANG -ovtt $TOKEN.wav \
+		>./redir.txt 2>/dev/null
 		then
 			echo "error transcribing"
 			curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/error/$ID" -d "error=12"
@@ -305,6 +312,8 @@ do
 	curl -H "Authorization: Bearer $ATOKEN" "https://api.fyyd.de/0.2/transcribe/set/$ID" --data-binary @$TOKEN.wav.vtt
 	rm $TOKEN.wav
 	rm $TOKEN.wav.vtt
+
+	rm -rf "$tmpdir"
 	
 	if [ -f ~/.fyyd-stop ]; then
 		rm ~/.fyyd-stop
