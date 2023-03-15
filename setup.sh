@@ -9,6 +9,46 @@ if [ -f ./fyyd.cfg ]
 		source "./fyyd.cfg"
 fi
 
+CLIENT_ID=jrqi32l6txq3e6ontu7ouys6IteaHncvz4scsaltjncyZ9ia
+
+if [ -z "$ACCESSTOKEN" ]
+	then
+		echo ""
+		echo "First you need to fetch an accesstoken for transcription service from fyyd. Please provide your login credentials: "
+		echo ""
+		echo -n "username: "
+		read username 
+
+		echo -n "password: "
+		read -s password
+
+		returncode=$(curl https://fyyd.de/oauth/basic/authorize/${CLIENT_ID} -u "${username}:${password}" --write-out '%{http_code}' --silent --output ./accesstoken.txt)
+
+		if [ $returncode -eq 202 ]
+			then
+				echo -n "mfa code: "
+				read mfa
+				returnmfa=$(curl https://fyyd.de/oauth/basic/authorize/${CLIENT_ID} -u "${username}:${password}:${mfa}" --write-out '%{http_code}' --silent --output ./accesstoken.txt)
+		
+				if [ ! $returnmfa -eq 200 ]
+					then
+						echo "could not authenticate!"
+						exit
+				fi
+	
+			elif [ ! $returncode -eq 200 ]
+				then
+						echo "could not authenticate!"
+						exit
+	
+		fi
+
+		read ACCESSTOKEN < accesstoken.txt
+		rm -f accesstoken.txt
+		echo ""
+fi
+
+
 if [ -f ./.rates.txt ]
 	then
 		rm -f ./.rates.txt

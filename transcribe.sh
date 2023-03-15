@@ -199,7 +199,6 @@ echo "Checking for updates"
 	
 echo "Starting engines! Let's transcribe some episodes!"
 cd whisper.cpp
-
 printf '=%.0s' $(seq 1  $(tput cols))
 echo ""
 
