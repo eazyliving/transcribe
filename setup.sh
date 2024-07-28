@@ -11,7 +11,7 @@ fi
 
 CLIENT_ID=jrqi32l6txq3e6ontu7ouys6IteaHncvz4scsaltjncyZ9ia
 
-if [ -z "$ACCESSTOKEN" ]
+if [ -z "$ATOKEN" ]
 	then
 		echo ""
 		echo "First you need to fetch an accesstoken for transcription service from fyyd. Please provide your login credentials: "
