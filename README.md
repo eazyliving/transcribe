@@ -5,7 +5,7 @@ ACHTUNG! Das hier ist nicht ready to go, wenn auf Deinem Rechner/Server nicht sc
 Das ist vor allem eine lauffähige Entwicklungsumgebung, weil die eigentliche Software, die das transkribieren übernimmt erst noch compiliert werden muss.
 Dafür kann ich keinen Support leisten, also solltest Du wissen, wo links+rechts ist, schließlich ist das ein Beta-Test :)
 
-Die Scripte sind auf macOS und Ubuntu getestet, sollten also soweit keine Probleme bereiten. 
+Die Scripte sind auf macOS und Ubuntu getestet, sollten also soweit keine Probleme bereiten.
 Aktuell ist das alles noch ohne dauerhaftes Transkribieren angelegt. Du startest das Skript und es wird transkribiert, bis nichts mehr da ist. Dann endet die Software und startet erst wieder, wenn Du das Script noch einmal startest. Das wird sich aber noch ändern... irgendwann :)
 
 Darüber hinaus müssen bereits installiert sein:
@@ -40,3 +40,11 @@ Unterbrechung mit CTRL+C ist jederzeit möglich, dann wird fyyd signalisiert, da
 Datei namens .fyyd-stop an, dann wird nach der Transkription gestoppt.
 
 Und jetzt: los! :)
+
+## CUDA setup
+Solltest du eine (oder gar mehrere) CUDA-fähige Grafikkarte(n) haben, kannst du die Transkription auch auf der GPU laufen lassen.
+Um whisper.cpp mit CUDA zu kompilieren, musst du das setup mit `./setup.sh -c` aufrufen.
+
+Um die Transkription auf der GPU laufen zu lassen, kannst du `transcribe.sh` mit dem Parameter `-c GPUID` aufrufen, als z.B. `./transcribe.sh -c 0` für die erste GPU.
+
+Du kannst damit auch mehere GPUs gleichzeitig nutzen, in dem du `transcribe.sh` mehrfach mit unterschiedlichen GPUIDs aufrufst.
