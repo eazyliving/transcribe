@@ -10,7 +10,7 @@ while getopts "c:" opt; do
             echo "starting instance ${OPTARG}"
             ;;
         \?)
-            echo "Usage: fyyd-transcribe.sh [-c CUDA_VISIBLE_DEVICES]"
+            echo "Usage: transcribe.sh [-c CUDA_VISIBLE_DEVICES]"
             exit 1
             ;;
     esac
