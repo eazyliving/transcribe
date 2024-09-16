@@ -3,10 +3,11 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PB_PID=""
 
-while getopts "c" opt; do
+while getopts "c:" opt; do
     case ${opt} in
         c)
-            CUDA_VISIBLE_DEVICES=${OPTARG}
+            export CUDA_VISIBLE_DEVICES=${OPTARG}
+            echo "starting instance ${OPTARG}"
             ;;
         \?)
             echo "Usage: fyyd-transcribe.sh [-c CUDA_VISIBLE_DEVICES]"
