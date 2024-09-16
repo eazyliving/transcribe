@@ -3,7 +3,7 @@
 while getopts "c" opt; do
     case ${opt} in
         c)
-            GGML_CUDA=1
+            export USE_CUDA=1
             ;;
         \?)
             echo "Usage: fyyd-transcribe.sh [-c]"
@@ -108,7 +108,12 @@ if [ ! -f "whisper.cpp/whisper.cpp" ]
 
 		echo "compiling whisper..."
 		cd whisper.cpp
-		make
+		if [ "$USE_CUDA" ]
+            then
+                GGML_CUDA=1 make -j
+            else
+                make -j
+        fi
 
 		echo "downloading the model"
 		./models/download-ggml-model.sh $MODEL
