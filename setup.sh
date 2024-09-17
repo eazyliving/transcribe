@@ -1,5 +1,17 @@
 #!/bin/bash
 
+while getopts "c" opt; do
+    case ${opt} in
+        c)
+            export USE_CUDA=1
+            ;;
+        \?)
+            echo "Usage: fyyd-transcribe.sh [-c]"
+            exit 1
+            ;;
+    esac
+done
+
 MODEL=medium
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR
@@ -17,7 +29,7 @@ if [ -z "$ATOKEN" ]
 		echo "First you need to fetch an accesstoken for transcription service from fyyd. Please provide your login credentials: "
 		echo ""
 		echo -n "username: "
-		read username 
+		read username
 
 		echo -n "password: "
 		read -s password
@@ -29,18 +41,18 @@ if [ -z "$ATOKEN" ]
 				echo -n "mfa code: "
 				read mfa
 				returnmfa=$(curl https://fyyd.de/oauth/basic/authorize/${CLIENT_ID} -u "${username}:${password}:${mfa}" --write-out '%{http_code}' --silent --output ./accesstoken.txt)
-		
+
 				if [ ! $returnmfa -eq 200 ]
 					then
 						echo "could not authenticate!"
 						exit
 				fi
-	
+
 			elif [ ! $returncode -eq 200 ]
 				then
 						echo "could not authenticate!"
 						exit
-	
+
 		fi
 
 		read ACCESSTOKEN < accesstoken.txt
@@ -92,21 +104,26 @@ fi
 if [ ! -f "whisper.cpp/whisper.cpp" ]
 	then
 		echo "downloading whisper.cpp"
-		git clone https://github.com/ggerganov/whisper.cpp	
-		
+		git clone https://github.com/ggerganov/whisper.cpp
+
 		echo "compiling whisper..."
 		cd whisper.cpp
-		make
-		
+		if [ "$USE_CUDA" ]
+            then
+                GGML_CUDA=1 make -j
+            else
+                make -j
+        fi
+
 		echo "downloading the model"
-		./models/download-ggml-model.sh $MODEL	
+		./models/download-ggml-model.sh $MODEL
 	else
 		cd whisper.cpp
 fi
 
 THREADS=0
 THREADS=`getconf _NPROCESSORS_ONLN`
-if [ $? -ne 0 ] 
+if [ $? -ne 0 ]
 	then
 		THREADS=`getconf NPROCESSORS_ONLN`
 fi
@@ -120,11 +137,11 @@ if [ $THREADS -eq 0 ]
 fi
 
 read inputthreads
-	
+
 if [ ! -z "$inputthreads" ]
 	then
 		THREADS=$inputthreads
-fi		
+fi
 
 THREAD_OPT=""
 
